@@ -40,7 +40,7 @@ const takeScreenshot = ({ source, clientId, fileName }: ItakeScreenshot) => {
       .on("error", reject)
       // .on("filenames", (filename) => console.log(filename))
       .screenshots({
-        timemarks: [1],
+        timemarks: [0],
         count: 1,
         filename: outputFile,
         folder: `./thumbnails/${clientId}`,

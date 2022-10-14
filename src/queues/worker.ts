@@ -38,7 +38,7 @@ const start = () => {
       const flStreamId: string = url.split("//")[1].split("/")[1]; //return "streamId == client_id"
       const apiPath = process.env.APP_FLUESONIC_API_STREAMS as string;
       const reqUrl = `https://${flHost}:${flPort}/${apiPath}/${flStreamId}`;
-      const reqUrlVideoScreenshot = `https://${flHost}:${flPort}/${flStreamId}/preview.mp4`
+      const reqUrlVideoScreenshot = `https://${flHost}:${flPort}/${flStreamId}`;
 
       //Проверяем статус запрашиваемого стрима
       const { data } = await axios
@@ -77,7 +77,7 @@ const start = () => {
           //получаем скриншот на текущий момент
           takeScreenshot({
             clientId: flStreamId,
-            source: url + `/index-${thisMoment}-10.m3u8`,
+            source: reqUrlVideoScreenshot + `/${thisMoment}-preview.mp4`,
             fileName: firstImgName,
           }).then(() => {
             progress = +25;
@@ -87,7 +87,7 @@ const start = () => {
           //получаем предыдущий скриншот
           takeScreenshot({
             clientId: flStreamId,
-            source: url + `/index-${previousMoment}-10.m3u8`,
+            source: reqUrlVideoScreenshot + `/${previousMoment}-preview.mp4`,
             fileName: secondImgName,
           }).then(() => {
             progress = +25;
@@ -109,8 +109,9 @@ const start = () => {
         // console.log(data);
         job.log(`job is complete:  ${new Date().toLocaleString()}`);
         if (data.compare.status === false) {
-          console.log("::img don't match, need")
-        } progress = +100;
+          console.log("::img don't match, need");
+        }
+        progress = +100;
         job.progress(progress);
       });
 
