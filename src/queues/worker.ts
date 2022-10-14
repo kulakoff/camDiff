@@ -40,7 +40,7 @@ const start = () => {
       const reqUrl = `https://${flHost}:${flPort}/${apiPath}/${flStreamId}`;
       const reqUrlVideoScreenshot = `https://${flHost}:${flPort}/${flStreamId}/preview.mp4`
 
-      //Проверяем статус  запрашиваемого стрима
+      //Проверяем статус запрашиваемого стрима
       const { data } = await axios
         .get(reqUrl, {
           headers: {
@@ -84,7 +84,7 @@ const start = () => {
             job.log(`get ${firstImgName}:  ${new Date().toLocaleString()}`);
             job.progress(progress);
           }),
-          //получаем прелылуший скриншот
+          //получаем предыдущий скриншот
           takeScreenshot({
             clientId: flStreamId,
             source: url + `/index-${previousMoment}-10.m3u8`,
@@ -95,7 +95,7 @@ const start = () => {
             job.progress(progress);
           }),
         ])
-          //Сравниваем  полученные скриншоты
+          //Сравниваем полученные скриншоты
           .then(async () => {
             const compareResult = await compareImages({
               fileName1: `./thumbnails/${flStreamId}/${firstImgName}.png`,
