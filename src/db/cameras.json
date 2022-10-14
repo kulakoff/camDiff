@@ -1,0 +1,5 @@
+{
+  "cameras": [
+    { "url": "https://flu99.host.net:8443/12345", "client_id": 12345 }
+  ]
+}
