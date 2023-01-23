@@ -16,6 +16,11 @@ export interface IcreateCamDiffWorker {
   threshold?: number; //Чувствительность в процентах
 }
 
+export interface IcreateSslCheckerWorker {
+  url: string;
+  port: number;
+}
+
 const createCamDiffWorker = ({
   url,
   client_id,
@@ -32,6 +37,15 @@ const createCamDiffWorker = ({
   );
 };
 
+const createSslCheckerWorker = ({ url, port }: IcreateSslCheckerWorker) => {
+  return camDiffQueue.add(
+    { url, port },
+    {
+      attempts: 5,
+    }
+  );
+};
+
 //Назначаем приоритет для задачи
 const getJobPriority = (type: string | null) => {
   //   if (!task.qos) return 3;
@@ -39,4 +53,11 @@ const getJobPriority = (type: string | null) => {
   return 3;
 };
 
-export { camDiffQueue, createCamDiffWorker };
+const sslCheckerQueue = new Queue("sslChecker", {
+  redis: {
+    host: process.env.API_REDIS_HOST || "127.0.0.1",
+    port: parseInt(String(process.env.API_REDIS_PORT || 6379)),
+  },
+});
+
+export { camDiffQueue, createCamDiffWorker, sslCheckerQueue, createSslCheckerWorker };

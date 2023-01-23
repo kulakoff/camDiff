@@ -3,9 +3,12 @@ require("dotenv").config();
 import Koa, { DefaultState, DefaultContext, ParameterizedContext } from "koa";
 import Router from "@koa/router";
 import bodyParser from "koa-bodyparser";
-import "colors";
 
-import { createCamDiffWorker, camDiffQueue } from "./queues/queues";
+import {
+  createCamDiffWorker,
+  camDiffQueue,
+  sslCheckerQueue,
+} from "./queues/queues";
 
 import { createBullBoard } from "@bull-board/api";
 import { BullAdapter } from "@bull-board/api/bullAdapter";
@@ -21,7 +24,7 @@ const serverAdapter = new KoaAdapter();
 
 serverAdapter.setBasePath("/admin");
 createBullBoard({
-  queues: [new BullAdapter(camDiffQueue)],
+  queues: [new BullAdapter(camDiffQueue), new BullAdapter(sslCheckerQueue)],
   serverAdapter,
 });
 
@@ -51,7 +54,7 @@ router.post("/cam", async (ctx) => {
     return (ctx.body = { status: "fail", message: "bad request body" });
   }
   const job = await createCamDiffWorker({ url, client_id });
-  ctx.body = { status: "created", streamId:client_id,jobId: job.id };
+  ctx.body = { status: "created", streamId: client_id, jobId: job.id };
 });
 
 app.use(serverAdapter.registerPlugin());
@@ -61,7 +64,7 @@ app.use(router.allowedMethods());
 
 // Прослушивание выполенных задач
 camDiffQueue.on("global:completed", (jobId, result) =>
-  console.log(`::log jobId ${jobId} completed. res: ${result}` )
+  console.log(`::log jobId ${jobId} completed. res: ${result}`)
 );
 
 app
