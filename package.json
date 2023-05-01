@@ -27,6 +27,7 @@
     "koa": "^2.13.4",
     "koa-body": "^5.0.0",
     "koa-bodyparser": "^4.3.0",
+    "ssl-checker": "^2.0.7",
     "throng": "^5.0.0"
   },
   "devDependencies": {
