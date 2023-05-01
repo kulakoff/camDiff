@@ -18,7 +18,7 @@ import { takeScreenshot } from "./helpers/utls";
 
 const app: Koa<DefaultState, DefaultContext> = new Koa();
 const router: Router = new Router();
-const APP_PORT = 3000;
+const APP_PORT:string = process.env.APP_PORT || '3000';
 
 const serverAdapter = new KoaAdapter();
 
@@ -28,6 +28,7 @@ createBullBoard({
   serverAdapter,
 });
 
+//Demo endpoint for check service
 router.get(
   "/health",
   async (ctx: ParameterizedContext<DefaultState, DefaultContext>) => {
@@ -62,11 +63,11 @@ app.use(bodyParser());
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-// Прослушивание выполенных задач
+// Прослушивание завершенных задач
 camDiffQueue.on("global:completed", (jobId, result) =>
   console.log(`::log jobId ${jobId} completed. res: ${result}`)
 );
 
 app
   .listen(APP_PORT)
-  .on("listening", () => console.log(`App started on port ${APP_PORT}`));
+  .on("listening", () => console.log(`App started on port ${APP_PORT}\n open http://localhost:${APP_PORT}/admin`));
