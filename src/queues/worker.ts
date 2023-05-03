@@ -109,7 +109,7 @@ const start = () => {
         // console.log(data);
         job.log(`job is complete:  ${new Date().toLocaleString()}`);
         if (data.compare.status === false) {
-          console.log("::img don't match, need");
+          console.log("::img don't match, verification required\n");
         }
         progress = +100;
         job.progress(progress);
