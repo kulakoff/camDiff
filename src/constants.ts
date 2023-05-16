@@ -1,0 +1,1 @@
+export const QUEUE_CAM_DIFFERENCE = 'cam_difference';
