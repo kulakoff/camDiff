@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CamWorkerModule } from './cam-worker/cam-worker.module';
 import { BullModule } from '@nestjs/bull';
 import { QUEUE_CAM_DIFFERENCE } from './constants';
+import { BullBoardModule } from '@nestql/bull-board';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { QUEUE_CAM_DIFFERENCE } from './constants';
     }),
     BullModule.registerQueue({
       name: QUEUE_CAM_DIFFERENCE
-    })
+    }),
+    BullBoardModule.register({autoAdd: true, path: 'dasboard'})
   ],
   controllers: [AppController],
   providers: [AppService],
