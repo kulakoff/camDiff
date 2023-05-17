@@ -24,7 +24,7 @@ import { BullBoardModule } from '@nestql/bull-board';
     BullModule.registerQueue({
       name: QUEUE_CAM_DIFFERENCE
     }),
-    BullBoardModule.register({autoAdd: true, path: 'dasboard'})
+    BullBoardModule.register({autoAdd: true, path: 'dashboard'})
   ],
   controllers: [AppController],
   providers: [AppService],
