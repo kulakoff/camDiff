@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, Logger } from '@nestjs/common';
 import { CamWorkerService } from './cam-worker.service';
 import { CreateCamWorkerDto } from './dto/create-cam-worker.dto';
 import { UpdateCamWorkerDto } from './dto/update-cam-worker.dto';
@@ -7,8 +7,10 @@ import { UpdateCamWorkerDto } from './dto/update-cam-worker.dto';
 export class CamWorkerController {
   constructor(private readonly camWorkerService: CamWorkerService) {}
 
+  @UsePipes(new ValidationPipe())
   @Post()
   create(@Body() createCamWorkerDto: CreateCamWorkerDto) {
+    console.log(createCamWorkerDto);
     return this.camWorkerService.create(createCamWorkerDto);
   }
 
