@@ -6,11 +6,14 @@ import { CamWorkerModule } from './cam-worker/cam-worker.module';
 import { BullModule } from '@nestjs/bull';
 import { QUEUE_CAM_DIFFERENCE } from './constants';
 import { BullBoardModule } from '@nestql/bull-board';
+import { CamWorkerController } from './cam-worker/cam-worker.controller';
+import { CamWorkerService } from './cam-worker/cam-worker.service';
+import {ConsumerService} from './cam-worker/consumer/consumer.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true}),
-    CamWorkerModule,
+    // CamWorkerModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -26,7 +29,7 @@ import { BullBoardModule } from '@nestql/bull-board';
     }),
     BullBoardModule.register({autoAdd: true, path: 'dashboard'})
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, CamWorkerController],
+  providers: [AppService, CamWorkerService, ConsumerService],
 })
 export class AppModule {}
