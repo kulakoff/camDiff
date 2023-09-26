@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  redis:
+    container_name: redis-camDiff
+    image: redis:7-alpine
+    #command: [ "sh", "-c", "exec redis-server --requirepass \"${REDIS_PASSWORD}\"" ]
+    ports:
+      - "6379"
+    volumes:
+      - redis-camDiff-data:/data
+    networks:
+      demo-network:
+        ipv4_address: "${REDIS_NETWORK_ADDRESS}"
+
+volumes:
+  redis-camDiff-data:
+
+networks:
+  demo-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "${NETWORK_ADDRESS}"
+          gateway: "${NETWORK_GW}"
