@@ -19,15 +19,14 @@ const APP_PORT = 3000;
 
 const serverAdapter = new KoaAdapter();
 
+// Admin panel
 serverAdapter.setBasePath("/admin");
 createBullBoard({
   queues: [new BullAdapter(camDiffQueue)],
   serverAdapter,
 });
 
-router.get(
-  "/health",
-  async (ctx: ParameterizedContext<DefaultState, DefaultContext>) => {
+router.get( "/health",async (ctx: ParameterizedContext<DefaultState, DefaultContext>) => {
     ctx.body = {
       status: "ok",
       data: "Server is working",
@@ -54,12 +53,12 @@ router.post("/cam", async (ctx) => {
   ctx.body = { status: "created", streamId:client_id,jobId: job.id };
 });
 
-app.use(serverAdapter.registerPlugin());
-app.use(bodyParser());
-app.use(router.routes());
-app.use(router.allowedMethods());
+app.use(serverAdapter.registerPlugin())
+  .use(bodyParser())
+  .use(router.routes())
+  .use(router.allowedMethods());
 
-// Прослушивание выполенных задач
+// Прослушивание завершенных задач
 camDiffQueue.on("global:completed", (jobId, result) =>
   console.log(`::log jobId ${jobId} completed. res: ${result}` )
 );
