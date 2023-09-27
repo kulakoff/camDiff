@@ -1,3 +1,5 @@
+import { log } from 'util';
+
 require("dotenv").config();
 
 import Koa, { DefaultState, DefaultContext, ParameterizedContext } from "koa";
@@ -27,7 +29,8 @@ createBullBoard({
 });
 
 router.get( "/health",async (ctx: ParameterizedContext<DefaultState, DefaultContext>) => {
-    ctx.body = {
+  console.log(ctx);
+  ctx.body = {
       status: "ok",
       data: "Server is working",
     };
@@ -44,10 +47,11 @@ router.post("/cam", async (ctx) => {
    * TODO: переделать типизацию для
    * ctx.request.body
    */
+  console.log(ctx.request.body)
   const { url, client_id } = <any>ctx.request.body;
   if (!url || !client_id) {
-    ctx.status = 404;
-    return (ctx.body = { status: "fail", message: "bad request body" });
+    ctx.status = 400;
+    return (ctx.body = { status: "Fail", message: "Bad request body" });
   }
   const job = await createCamDiffWorker({ url, client_id });
   ctx.body = { status: "created", streamId:client_id,jobId: job.id };

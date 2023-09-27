@@ -35,9 +35,9 @@ const takeScreenshot = ({ source, clientId, fileName }: ItakeScreenshot) => {
     const outputFile = `${fileName}.png`;
     fh.createDirIfNotExists(`./thumbnails/${clientId}`);
 
-    await ffmpeg({ source })
-      .on("end", () => resolve("Thumbnail created " + outputFile))
-      .on("error", reject)
+    ffmpeg({ source })
+      .on('end', () => resolve('Thumbnail created ' + outputFile))
+      .on('error', reject)
       // .on("filenames", (filename) => console.log(filename))
       .screenshots({
         timemarks: [0],

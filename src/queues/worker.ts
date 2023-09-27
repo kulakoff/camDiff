@@ -28,7 +28,11 @@ const start = () => {
 
   camDiffQueue.process(maxJobsPerWorker, async (job) => {
     try {
-      job.log("job started: " + new Date().toLocaleString());
+      // console.log("job:");
+      // console.log(job);
+      const now = new Date().toLocaleString("RU")
+
+      job.log("Worker | Job started: " + now);
       let progress: number = 0;
       let result: any;
 
@@ -36,8 +40,11 @@ const start = () => {
       const flHost: string = url.split("//")[1].split("/")[0].split(":")[0]; //return "fl2.lanta.me"
       const flPort: string = url.split("//")[1].split("/")[0].split(":")[1]; //return "8443"
       const flStreamId: string = url.split("//")[1].split("/")[1]; //return "streamId == client_id"
-      const apiPath = process.env.APP_FLUESONIC_API_STREAMS as string;
+      console.log(`:: DEBUG | Worker | flHost: ${flHost} | flPort: ${flPort} | flStreamId: ${flStreamId}`);
+
+      const apiPath = process.env.APP_FLUSSONIC_API_STREAMS as string;
       const reqUrl = `https://${flHost}:${flPort}/${apiPath}/${flStreamId}`;
+      console.log(reqUrl);
       const reqUrlVideoScreenshot = `https://${flHost}:${flPort}/${flStreamId}`;
 
       //Проверяем статус запрашиваемого стрима
@@ -45,9 +52,9 @@ const start = () => {
         .get(reqUrl, {
           headers: {
             Authorization: `Basic ${toBase64(
-              (process.env.APP_FLUESONIC_USERNAME +
+              (process.env.APP_FLUSSONIC_USERNAME +
                 ":" +
-                process.env.APP_FLUESONIC_PASSWORD) as string
+                process.env.APP_FLUSSONIC_PASSWORD) as string
             )}`,
           },
         })
@@ -58,17 +65,17 @@ const start = () => {
       const dvrActive = dvrEnabled && dvrAlive;
 
       if (dvrActive) {
-        job.log(`DVR is active:  ${new Date().toLocaleString()}`);
+        job.log(`Worker | DVR is active:  ${new Date().toLocaleString()}`);
       } else {
-        job.log(`DVR is not active:  ${new Date().toLocaleString()}`);
-        return { status: "ok", message: "DVR is not active" };
+        job.log(`Worker | DVR is not active:  ${new Date().toLocaleString()}`);
+        return { status: "OK", message: "DVR is not active" };
       }
 
       const momentStep = 1800;
       const thisMoment: number = +(Date.now() / 1000).toFixed(0) - 300;
       const previousMoment: number = thisMoment - momentStep;
-      const firstImgName = `imgCurrent_${thisMoment}`;
-      const secondImgName = `imgPrevious_${previousMoment}`;
+      const firstImgName = `${thisMoment}_imgCurrent`;
+      const secondImgName = `${thisMoment}_imgPrevious`;
 
       // Получаем скриншоты с камер
       const result_ =
@@ -81,7 +88,7 @@ const start = () => {
             fileName: firstImgName,
           }).then(() => {
             progress = +25;
-            job.log(`get ${firstImgName}:  ${new Date().toLocaleString()}`);
+            job.log(`Worker | get first img: get ${firstImgName}:  ${new Date().toLocaleString()}`);
             job.progress(progress);
           }),
           //получаем предыдущий скриншот
@@ -91,7 +98,7 @@ const start = () => {
             fileName: secondImgName,
           }).then(() => {
             progress = +25;
-            job.log(`get ${secondImgName}:  ${new Date().toLocaleString()}`);
+            job.log(`Worker | get second img: get ${secondImgName}:  ${new Date().toLocaleString()}`);
             job.progress(progress);
           }),
         ])
@@ -106,7 +113,7 @@ const start = () => {
           });
 
       result_.then((data: any) => {
-        // console.log(data);
+       // console.log(data);
         job.log(`job is complete:  ${new Date().toLocaleString()}`);
         if (data.compare.status === false) {
           console.log("::img don't match, need");
@@ -114,6 +121,12 @@ const start = () => {
         progress = +100;
         job.progress(progress);
       });
+
+      /** TODO:
+       *  - make pixelMatch image difference map!
+       *  - make fail event to tg
+       */
+
 
       // throw an error 5% of the time
       // if (Math.random() < 0.05) {
