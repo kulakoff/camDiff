@@ -11,8 +11,8 @@ const camDiffQueue = new Queue("camDiff", {
 export interface IcreateCamDiffWorker {
   url: string;
   client_id: number; //stream id
-  type?: string | null; // Пока не используется, есть  задумка использовать этот атрибут  для выставления приоритера
-  step?: number; //Количество милисекунд от текущей даты для снятия скриншота
+  type?: string | null; // Пока не используется, есть задумка использовать этот атрибут для выставления приоритета
+  step?: number; //Количество миллисекунд от текущей даты для получения скриншота
   threshold?: number; //Чувствительность в процентах
 }
 

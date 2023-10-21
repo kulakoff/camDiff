@@ -1,2 +1,2 @@
 api: npx tsnd --respawn --transpile-only ./src/app.ts
-worker: npx tsnd --respawn --transpile-only ./src/queues/worker.ts
+worker: npx tsnd --respawn --transpile-only ./src/workers/worker.ts

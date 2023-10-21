@@ -7,7 +7,7 @@
     "start": "nf start",
     "dev": "nf start -j Procfile_dev",
     "dev:app": "npx tsnd --respawn --transpile-only ./src/app.ts",
-    "dev:worker": "npx tsnd --respawn --transpile-only ./src/queues/worker.ts"
+    "dev:worker": "npx tsnd --respawn --transpile-only ./src/workers/worker.ts"
   },
   "keywords": [],
   "author": "",
