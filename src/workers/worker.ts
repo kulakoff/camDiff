@@ -2,7 +2,7 @@ import throng from "throng";
 import axios from "axios";
 import ffmpeg from "fluent-ffmpeg";
 // import Queue from "bull";
-import { camDiffQueue, IcreateCamDiffWorker } from "./queues";
+import { camDiffQueue, IcreateCamDiffWorker } from "../queues/queues";
 import fh from "../helpers/fileHandler";
 import { compareImages, pixelMatch, takeScreenshot } from "../helpers/utls";
 
