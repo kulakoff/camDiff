@@ -22,6 +22,16 @@ const FileHandler = class {
       callback(err, size);
     });
   }
+
+  deleteFile(filePath: string, callback:any){
+    fs.unlink(filePath, (err)=>{
+      if (err) {
+        callback(err);
+      } else {
+        callback(null, `File ${filePath} deleted successfully`);
+      }
+    })
+  }
 };
 
 export default new FileHandler();
