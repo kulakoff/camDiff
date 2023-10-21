@@ -40,15 +40,17 @@ router.get( "/health",async (ctx: ParameterizedContext<DefaultState, DefaultCont
 interface IRequestBody {
   url: string;
   client_id: number;
-  step?: number;
+  step?: number; // шаг архива 1800 по-умолчанию
 }
 router.post("/cam", async (ctx) => {
+
   /**
    * TODO: переделать типизацию для
    * ctx.request.body
    */
-  console.log(ctx.request.body)
-  const { url, client_id } = <any>ctx.request.body;
+  //console.log(ctx.request.body)
+
+  const { url, client_id } = <IRequestBody>ctx.request.body;
   if (!url || !client_id) {
     ctx.status = 400;
     return (ctx.body = { status: "Fail", message: "Bad request body" });
