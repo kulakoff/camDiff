@@ -3,7 +3,7 @@ import axios from "axios";
 import ffmpeg from "fluent-ffmpeg";
 // import Queue from "bull";
 import { camDiffQueue, IcreateCamDiffWorker } from "./queues";
-// import fh from "../helpers/fileHandler";
+import fh from "../helpers/fileHandler";
 import { compareImages, pixelMatch, takeScreenshot } from "../helpers/utls";
 
 const workers = process.env.APP_CONCURRENCY || 2;
@@ -15,9 +15,9 @@ interface ItakeScreenshot {
   fileName: string;
 }
 
-const sleep = (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-};
+// const sleep = (ms: number) => {
+//   return new Promise((resolve) => setTimeout(resolve, ms));
+// };
 
 const toBase64 = (data: string): string => {
   return Buffer.from(data).toString("base64");
@@ -28,8 +28,6 @@ const start = () => {
 
   camDiffQueue.process(maxJobsPerWorker, async (job) => {
     try {
-      // console.log("job:");
-      // console.log(job);
       const now = new Date().toLocaleString("RU")
 
       job.log("Worker | Job started: " + now);
@@ -40,11 +38,11 @@ const start = () => {
       const flHost: string = url.split("//")[1].split("/")[0].split(":")[0]; //return "fl2.lanta.me"
       const flPort: string = url.split("//")[1].split("/")[0].split(":")[1]; //return "8443"
       const flStreamId: string = url.split("//")[1].split("/")[1]; //return "streamId == client_id"
-      console.log(`:: DEBUG | Worker | flHost: ${flHost} | flPort: ${flPort} | flStreamId: ${flStreamId}`);
+      console.log(`:: DEBUG | Worker start | flHost: ${flHost} | flPort: ${flPort} | flStreamId: ${flStreamId}`);
 
       const apiPath = process.env.APP_FLUSSONIC_API_STREAMS as string;
       const reqUrl = `https://${flHost}:${flPort}/${apiPath}/${flStreamId}`;
-      console.log(reqUrl);
+      // console.log(reqUrl);
       const reqUrlVideoScreenshot = `https://${flHost}:${flPort}/${flStreamId}`;
 
       //Проверяем статус запрашиваемого стрима
@@ -104,6 +102,7 @@ const start = () => {
         ])
           //Сравниваем полученные скриншоты
           .then(async () => {
+            job.log(`Worker | Start compare images:  ${new Date().toLocaleString()}`);
             const compareResult = await compareImages({
               fileName1: `./thumbnails/${flStreamId}/${firstImgName}.png`,
               fileName2: `./thumbnails/${flStreamId}/${secondImgName}.png`,
@@ -113,8 +112,37 @@ const start = () => {
           });
 
       result_.then((data: any) => {
-       // console.log(data);
+        console.log("result data:");
+        console.log(data);
         job.log(`job is complete:  ${new Date().toLocaleString()}`);
+        if ( data.compare.status === true) {
+          console.log("img is same, remove tmp files");
+          // console.log(client_id);
+          // console.log(`rm file ./thumbnails/${client_id}/${firstImgName}.png`);
+          // console.log(`rm file ./thumbnails/${client_id}/${secondImgName}.png`);
+          const filepathFirst = `./thumbnails/${client_id}/${firstImgName}.png`
+          const filepathSecond = `./thumbnails/${client_id}/${secondImgName}.png`
+
+          fh.deleteFile(filepathFirst, (err:any, res:any)=>{
+            if(err){
+              console.error(err)
+            } else {
+              console.log(res);
+            }
+          })
+
+          fh.deleteFile(filepathSecond, (err:any, res:any)=>{
+            if(err){
+              console.error(err)
+            } else {
+              console.log(res);
+            }
+          })
+
+          // Удалить скриншоты
+
+        }
+
         if (data.compare.status === false) {
           console.log("::img don't match, need");
         }
