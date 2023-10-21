@@ -13,30 +13,46 @@ interface StreamData {
   client_id: string;
 }
 
-const streamList: StreamData[] = [];
-const csvFilePath: string = './cameras.csv';
-const jsonFilePath: string = './stream-list.json';
-
 /**
- * Reads a CSV file containing streaming data and converts it to JSON format.
+ * Reads streaming data from a CSV file and converts it to a JSON file.
  * @param {string} csvFilePath - The path of the CSV file.
  * @param {string} jsonFilePath - The path of the JSON file to write the result.
+ * @param {Function} callback - The callback function to handle errors.
  */
-fs.createReadStream(csvFilePath)
-  .pipe(csvParser({ separator: ';' }))
-  .on('data', (row:any) => {
-    const { url, client_id } = row;
-    streamList.push({ url, client_id });
-  })
-  .on('end', () => {
-    console.log('Stream list:');
-    console.log(streamList);
+function processCSV(csvFilePath: string, jsonFilePath: string, callback: (error: Error | null) => void): void {
+  const streamList: StreamData[] = [];
 
-    // Write the parsed data to a JSON file
-    fs.writeFileSync(jsonFilePath, JSON.stringify(streamList, null, 2));
+  const readStream = fs.createReadStream(csvFilePath);
 
-    console.log('Result has been written to JSON file:', jsonFilePath);
-  })
-  .on('error', (error:any) => {
+  readStream
+    .on('error', (error) => {
+      callback(error);
+    })
+    .pipe(csvParser({ separator: ';' }))
+    .on('data', (row: StreamData) => {
+      streamList.push(row);
+    })
+    .on('end', () => {
+      console.log('Stream list:');
+      console.log(streamList);
+
+      // Write the parsed data to a JSON file
+      fs.writeFile(jsonFilePath, JSON.stringify(streamList, null, 2), (error) => {
+        if (error) {
+          callback(error);
+        } else {
+          console.log('Result has been written to JSON file:', jsonFilePath);
+          callback(null);
+        }
+      });
+    });
+}
+
+const csvFilePath = './cameras.csv';
+const jsonFilePath = './stream-list.json';
+
+processCSV(csvFilePath, jsonFilePath, (error) => {
+  if (error) {
     console.error('Error:', error.message);
-  });
+  }
+});
